@@ -1,0 +1,25 @@
+Category,Items,Artifacts
+Infra,Setup a VM for MM2 dedicated cluster,
+,1. Install Confluent Platform 7.1 / AK 3.1 ,To download POC version
+,2. Set $PATH to <Kafka Home>/bin (required for scripts later),
+,3. Stage migration artifacts,https://github.com/tpham305/kafka-migration-ccloud
+,4. Setup monitoring tool,TBD
+,,
+Network,allow network connectivity from MM2 VM to Source cluster and Confluent Cloud,
+,1. validate connectivity to source cluster,validate_connectivity.sh
+,2. validate connectivity to Confluent Cloud,validate_connectivity.sh
+,,
+Kafka,update migration config,
+,"1. Source cluster bootstrap server, authentication info. If SSL is enabled, truststore is required","source.properties, src-trusstore.jks"
+,"2. Confluent Cloud cluster bootstrap server,  authentication info",ccloud.properties
+,3. Environment properties for script ,env.properties
+,4. MirrorMaker2 config file to specify the list of topics and consumer groups to migrate,mm2.properties
+,"validate the configs by  running some Kafka CLIs to list topics, consumer groups to both clusters",consumer-offset-validation.sh
+,,
+Validation,Migrate a sample test topic to validate the setup & connectivity,
+,1. Start MM2 with mm2.properties (and jmxexporter enabled),
+,2. Validate topic and consumer groups replication status using Monitoring tool and script,consumer-offset-validation.sh
+,,
+Migration,update migration config ,
+,1. MirrorMaker2 config file to specify the list of topics and consumer groups to migrate,mm2.properties
+,2. Restart MM2,start_mm2.sh. stop_mm2.sh

@@ -1,0 +1,37 @@
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: Connect
+metadata:
+  name: connect
+spec:
+  replicas: 1
+  image:
+    application: confluentinc/cp-server-connect:7.3.0
+    init: confluentinc/confluent-init-container:2.5.0
+  dependencies:
+    kafka:
+      bootstrapEndpoint: pkc-ldvj1.ap-southeast-2.aws.confluent.cloud:9092
+      authentication:
+        type: plain
+        jaasConfig:
+          secretRef: ccloud-credentials
+      tls:
+        enabled: true
+        ignoreTrustStoreConfig: true 
+  connectorTLSCerts:
+    - secretRef: source-tls
+  mountedSecrets:
+    - secretRef: mm2-config
+  mountedVolumes:
+    volumes:
+    - name: mm2-jmx-exporter-config
+      configMap:
+        name: mm2-jmx-exporter
+    volumeMounts:
+    - name: mm2-jmx-exporter-config
+      mountPath: /mnt/config/mm2
+  configOverrides:
+    server:
+      - group.id="mm2-local-ccloud-1"
+    log4j:
+      - CONNECT_LOG4J_LOGGERS="org.apache.kafka.connect=DEBUG,org.apache.kafka.connect.mirror=DEBUG"
