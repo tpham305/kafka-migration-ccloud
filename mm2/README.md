@@ -47,6 +47,13 @@ export WORKDIR=<path to kafka-migration-cc/mm2>
 cd $WORKDIR
 ```
 #### Deploy configuration secrets
+##### ccloud credential
+```
+kubectl -n confluent create secret generic ccloud-credentials \
+--from-file=plain.txt=$WORKDIR/ccloud-credentials.txt \
+--save-config --dry-run=client -o yaml | kubectl apply -f -
+```
+
 ##### for mm2.properties config
 ```
 kubectl -n confluent create secret generic mm2-config \
@@ -89,11 +96,13 @@ scripts/start_mm2.sh
 kubectl exec -it connect-0 -- bash -c  "ps -ef | grep java" 
 ```
 There should be 2 java processs running, 1 of them is MirrorMaker2 with mm2.properties at the end
+
 3. Check for any error from MM2
 ```
 kubectl exec -it connect-0 -- bash -c "tail -f /var/log/kafka/mm2.log"
 ```
 4. Configure Autostart for MM2
+
 If connect pod is restarted, MM2 process doesn't autorestart.
 You can set cron job for `scripts/autostart_mm2.sh` to run every X mins to detect and autorestart
 
